@@ -1,0 +1,17 @@
+﻿<Window x:Class="VredeFysiologie.BeamerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="BeamerWindow" Height="336" Width="483" WindowStartupLocation="CenterScreen" KeyDown="Window_KeyDown">
+	<Window.Background>
+		<SolidColorBrush Color="Black"/>
+	</Window.Background>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="1*"/>
+		</Grid.RowDefinitions>
+		<Label x:Name="textBlockVrede" Margin="10,10,10,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Vrede" Foreground="White"/>
+		<Label x:Name="textBlockFysiologie" Margin="10,10,10,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="Fysiologie" Foreground="White"/>
+
+	</Grid>
+</Window>

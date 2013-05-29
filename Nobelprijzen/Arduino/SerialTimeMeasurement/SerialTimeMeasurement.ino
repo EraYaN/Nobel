@@ -11,12 +11,15 @@ int button2Pin = 3;
 void setup(){
 	pinMode(button1Pin,INPUT_PULLUP);
 	pinMode(button2Pin,INPUT_PULLUP);
+	pinMode(13,OUTPUT);
 	Serial.begin(115200);
 	//Serial.println("Started. Ready. 's' to start, 'r' to reset.");
 	running = false;
+	digitalWrite(13,running);
 }
 
 void loop(){
+	digitalWrite(13,running);
 	if(Serial.available()){
 		char byte;
 		byte = Serial.read();
@@ -39,14 +42,16 @@ void loop(){
 		button1State = (digitalRead(button1Pin)!=LOW);
 		button2State = (digitalRead(button2Pin)!=LOW);
 		if(lastButton1State != button1State && button1State==LOW && button1Done==false){
-			Serial.println("A");
+			Serial.print("A");
 			button1Done = true;
 		}
 		if(lastButton2State != button2State && button2State==LOW && button2Done==false){
-			Serial.println("B");
+			Serial.print("B");
 			button2Done = true;
 		}
 		lastButton1State = button1State;
 		lastButton2State = button2State;
 	}
+	if(button1Done&&button2Done)
+		running = false;
 }

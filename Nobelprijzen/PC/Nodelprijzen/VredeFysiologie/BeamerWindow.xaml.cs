@@ -18,6 +18,7 @@ namespace VredeFysiologie
 	/// </summary>
 	public partial class BeamerWindow : Window
 	{
+		public Boolean _allowclosing = false;
 		public BeamerWindow()
 		{
 			InitializeComponent();
@@ -41,6 +42,45 @@ namespace VredeFysiologie
 				}
 			}
 
+		}
+		public void showTimes(String teamA, long msA, String teamB, long msB){
+			//MessageBox.Show(teamA+": "+msA+"\n"+teamB+": "+msB);
+			teamATime.Content = String.Format("{1}: {0:F2}", (double)msA / 1000, teamA);
+			teamATime.Foreground = Brushes.Red;
+			teamBTime.Content = String.Format("{1}: {0:F2}", (double)msB / 1000, teamB);
+			teamBTime.Foreground = Brushes.Red;
+		}
+		public void updateStopwatch(String teamA, long msA, bool rA, String teamB, long msB, bool rB)
+		{
+			//MessageBox.Show(teamA+": "+msA+"\n"+teamB+": "+msB);
+			long ms = msA > msB ? msA : msB;
+			stopwatchLabel.Content = String.Format("{0:N2}", (double)ms / 1000);
+			if (!rA)
+			{
+				teamATime.Content = String.Format("{1}: {0:F2}", (double)msA / 1000, teamA);
+				teamATime.Foreground = Brushes.Red;
+			}
+			else
+			{
+				teamATime.Content = "Adten!!";
+				teamATime.Foreground = Brushes.White;
+			}
+			if (!rB)
+			{
+				teamBTime.Content = String.Format("{1}: {0:F2}", (double)msB / 1000, teamB);
+				teamBTime.Foreground = Brushes.Red;
+			}
+			else
+			{
+				teamBTime.Content = "Adten!!";
+				teamBTime.Foreground = Brushes.White;
+			}
+			
+		}
+
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			e.Cancel = !_allowclosing;
 		}
 	}
 }

@@ -19,6 +19,15 @@
 			<Label x:Name="teamATime" Content="Label" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
 			<Label x:Name="teamBTime" Content="Label" Grid.Column="1" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
 		</Grid>
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+			<ListBox x:Name="listBoxCol1" HorizontalAlignment="Left" Height="152" VerticalAlignment="Top" Width="238" Background="Black" BorderBrush="Black" Foreground="White" FontSize="14"/>
+			<ListBox x:Name="listBoxCol2" Grid.Column="1" HorizontalAlignment="Left" Height="152" VerticalAlignment="Top" Width="237" Background="Black" BorderBrush="Black" Foreground="White" FontSize="14"/>
+		</Grid>
+		<ListBox HorizontalAlignment="Left" Height="100" Margin="856,150,-481,0" Grid.RowSpan="2" VerticalAlignment="Top" Width="100"/>
 
 	</Grid>
 </Window>

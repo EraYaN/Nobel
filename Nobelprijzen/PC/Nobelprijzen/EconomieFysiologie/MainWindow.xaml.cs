@@ -32,9 +32,11 @@ namespace Nobel
 		FileInfo timesPath = new FileInfo("times.csv");
 		Timer timer = new Timer(50);
 		Timer timerPrematch = new Timer(1000);
+		Timer timerDatabase = new Timer(1000);
 		Action<String, long, bool, String, long, bool> updateSW;
 		Action<int> updatePM;
 		Action startAdt;
+		Action updateDB;
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -57,9 +59,16 @@ namespace Nobel
 			updateSW = bw.updateStopwatch;
 			updatePM = bw.updatePrematch;
 			startAdt = startTimers;
+			updateDB = updateDatabase;
 			timer.Elapsed += timer_Elapsed;
 			timerPrematch.Elapsed += timerPrematch_Elapsed;
+			timerDatabase.Elapsed += timerDatabase_Elapsed;
 			
+		}
+
+		void timerDatabase_Elapsed(object sender, ElapsedEventArgs e)
+		{
+			g.Dispatcher.BeginInvoke(DispatcherPriority.Send, updateDB);
 		}
 
 		void timerPrematch_Elapsed(object sender, ElapsedEventArgs e)
@@ -191,6 +200,10 @@ namespace Nobel
 		{
 			bw._allowclosing = true;
 			bw.Close();
+			if (connection!=null)
+			{
+				connection.Close();
+			}
 		}
 
 		private void cancelButton_Click(object sender, RoutedEventArgs e)
@@ -246,7 +259,45 @@ namespace Nobel
 			csb.Database = databaseTextBox.Text;
 			csb.UserID = userTextBox.Text;
 			csb.Password = passwordBox.Password;
-			connection = new MySqlConnection(csb.ToString());
+			try
+			{
+				connection = new MySqlConnection(csb.ToString());
+				connection.Open();
+				if (connection.State != System.Data.ConnectionState.Open)
+				{
+					MessageBox.Show("Not connected");
+				}
+				else
+				{
+					mysqlConnectButton.IsEnabled = false;
+					timerDatabase.Start();
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.ToString());
+			}
 		}
+		void updateDatabase()
+		{
+			string query = "SELECT * FROM prijs LIMIT 10;";
+			//Create Command
+			MySqlCommand cmd = new MySqlCommand(query, connection);
+			//Create a data reader and Execute the command
+			MySqlDataReader dataReader = cmd.ExecuteReader();
+			//Read the data and store them in the list
+			barItemsListBox.Items.Clear();
+			while (dataReader.Read())
+			{
+				barItemsListBox.Items.Add(new BarItem() { Name = dataReader["Prijs_Naam"].ToString(), Selected = false});
+			}
+			//close Data Reader
+			dataReader.Close();
+		}
+	}
+	class BarItem
+	{
+		public string Name;
+		public bool Selected;
 	}
 }

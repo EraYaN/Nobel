@@ -1,22 +1,14 @@
-﻿using System;
+﻿using MiDeRP;
+using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using MiDeRP;
-using System.IO.Ports;
 using System.Diagnostics;
 using System.IO;
-using System.Windows.Threading;
+using System.IO.Ports;
 using System.Timers;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace Nobel
 {
@@ -25,19 +17,24 @@ namespace Nobel
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		const int TimeoutBeforeStart = 3;
+		const int TimeoutBeforeStart = 4;
+		MySqlConnection connection;
 		BeamerWindow bw = new BeamerWindow();
 		String comPort = "";
 		SerialInterface Serial;
 		Stopwatch sA, sB;
 		String teamA, teamB;
-		Boolean fighting = false;
 		Boolean running = false;
+		Boolean runningPM = false;
+		int prematch = TimeoutBeforeStart;
 		List<String> teams = new List<String>();
 		FileInfo teamsPath = new FileInfo("teams.csv");
 		FileInfo timesPath = new FileInfo("times.csv");
 		Timer timer = new Timer(50);
+		Timer timerPrematch = new Timer(1000);
 		Action<String, long, bool, String, long, bool> updateSW;
+		Action<int> updatePM;
+		Action startAdt;
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -58,8 +55,24 @@ namespace Nobel
 				teamBComboBox.Items.Add(s);
 			}
 			updateSW = bw.updateStopwatch;
+			updatePM = bw.updatePrematch;
+			startAdt = startTimers;
 			timer.Elapsed += timer_Elapsed;
+			timerPrematch.Elapsed += timerPrematch_Elapsed;
 			
+		}
+
+		void timerPrematch_Elapsed(object sender, ElapsedEventArgs e)
+		{
+			if (runningPM)
+			{
+				prematch--;
+				g.Dispatcher.BeginInvoke(DispatcherPriority.Send, updatePM, prematch);
+				if (prematch == 0)
+				{
+					g.Dispatcher.BeginInvoke(DispatcherPriority.Send, startAdt);
+				}
+			}
 		}
 
 		void timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -124,16 +137,11 @@ namespace Nobel
 			teamB = teamBComboBox.SelectedItem.ToString();
 			if (teamA != String.Empty && teamB != String.Empty && teamA != teamB)
 			{
-				sA.Reset();
-				sB.Reset();
-				sA.Start();
-				sB.Start();
-				timer.Start();
-				Serial.SendByte((Byte)'r');
-				Serial.SendByte((Byte)'s');
-				running = true;
+				runningPM = true;
+				prematch = TimeoutBeforeStart;
+				timerPrematch.Start();				
 				startTimeButton.IsEnabled = false;
-				cancelButton.IsEnabled = true;
+				cancelButton.IsEnabled = false;
 			}
 			else
 			{
@@ -193,6 +201,52 @@ namespace Nobel
 			startTimeButton.IsEnabled = true;
 			cancelButton.IsEnabled = false;
 			bw.clearTimes();
-		}		
+		}
+		private void startTimers()
+		{
+			runningPM = false;
+			sA.Reset();
+			sB.Reset();
+			sA.Start();
+			sB.Start();
+			timer.Start();
+			Serial.SendByte((Byte)'r');
+			Serial.SendByte((Byte)'s');
+			runningPM = false;
+			running = true;
+			cancelButton.IsEnabled = true;
+			timerPrematch.Stop();
+		}
+
+		private void mysqlConnectButton_Click(object sender, RoutedEventArgs e)
+		{
+			MySqlConnectionStringBuilder csb = new MySqlConnectionStringBuilder();
+
+			if (String.IsNullOrEmpty(serverTextBox.Text))
+			{
+				MessageBox.Show("Enter server.");
+				return;
+			}
+			if (String.IsNullOrEmpty(userTextBox.Text))
+			{
+				MessageBox.Show("Enter username.");
+				return;
+			}
+			if (String.IsNullOrEmpty(passwordBox.Password))
+			{
+				MessageBox.Show("Enter password.");
+				return;
+			}
+			if (String.IsNullOrEmpty(databaseTextBox.Text))
+			{
+				MessageBox.Show("Enter password.");
+				return;
+			}			
+			csb.Server = serverTextBox.Text;
+			csb.Database = databaseTextBox.Text;
+			csb.UserID = userTextBox.Text;
+			csb.Password = passwordBox.Password;
+			connection = new MySqlConnection(csb.ToString());
+		}
 	}
 }

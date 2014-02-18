@@ -58,6 +58,17 @@ namespace Nobel
 			teamBTime.Foreground = Brushes.White;
 			stopwatchLabel.Content = "0.0";
 		}
+		public void updatePrematch(int sPM)
+		{
+			stopwatchLabel.Content = String.Format("{0:N0}", sPM);
+
+			teamATime.Content = "Klaar?";
+			teamATime.Foreground = Brushes.White;
+
+			teamBTime.Content = "Klaar?";
+			teamBTime.Foreground = Brushes.White;
+
+		}
 		public void updateStopwatch(String teamA, long msA, bool rA, String teamB, long msB, bool rB)
 		{
 			//MessageBox.Show(teamA+": "+msA+"\n"+teamB+": "+msB);

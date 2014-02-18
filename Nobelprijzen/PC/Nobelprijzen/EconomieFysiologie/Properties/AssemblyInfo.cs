@@ -7,11 +7,11 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("VredeFysiologie")]
+[assembly: AssemblyTitle("Nobel")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("EraYaN")]
-[assembly: AssemblyProduct("VredeFysiologie")]
+[assembly: AssemblyProduct("Nobel")]
 [assembly: AssemblyCopyright("Copyright © EraYaN 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -52,4 +52,4 @@ using System.Windows;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("0.5.29.7")]
-[assembly: AssemblyFileVersion("0.5.29.7")]
+[assembly: AssemblyFileVersion("2014.2.18.1")]

@@ -1,4 +1,4 @@
-﻿<Window x:Class="VredeFysiologie.MainWindow"
+﻿<Window x:Class="Nobel.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="350" Width="525" ResizeMode="NoResize" Closing="Window_Closing">
@@ -9,14 +9,11 @@
 		</Grid.RowDefinitions>
 		<Button x:Name="connectButton" Content="Connect" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top" Width="75" Grid.Row="1" Click="connectButton_Click"/>
 		<ComboBox x:Name="comPortComboBox" HorizontalAlignment="Left" Margin="10,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="120" DropDownOpened="comPortComboBox_DropDownOpened"/>
-		<TextBox x:Name="personATextBox" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="Persoon A" VerticalAlignment="Top" Width="120"/>
-		<TextBox x:Name="personBTextBox" HorizontalAlignment="Left" Height="23" Margin="157,10,0,0" TextWrapping="Wrap" Text="Persoon B" VerticalAlignment="Top" Width="120"/>
-		<TextBlock HorizontalAlignment="Left" Margin="135,11,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="17" RenderTransformOrigin="-0.765,0.627" Height="22"><Run Language="nl-nl" Text="VS."/></TextBlock>
-		<Button x:Name="fightButton" Content="Fight!" HorizontalAlignment="Left" Margin="282,10,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="fightButton_Click"/>
 		<StackPanel IsEnabled="False" x:Name="controlsFysiologieStackPanel" HorizontalAlignment="Left" Height="141" Margin="135,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="374">
 			<ComboBox x:Name="teamAComboBox" AlternationCount="1"/>
 			<ComboBox x:Name="teamBComboBox" AlternationCount="1"/>
 			<Button x:Name="startTimeButton" Content="Start Timer" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.733,2.55" Click="startTimeButton_Click"/>
+			<Button x:Name="cancelButton" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.733,2.55" Click="cancelButton_Click"/>
 		</StackPanel>
 
 	</Grid>

@@ -18,13 +18,14 @@ using System.IO;
 using System.Windows.Threading;
 using System.Timers;
 
-namespace VredeFysiologie
+namespace Nobel
 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		const int TimeoutBeforeStart = 3;
 		BeamerWindow bw = new BeamerWindow();
 		String comPort = "";
 		SerialInterface Serial;
@@ -35,7 +36,6 @@ namespace VredeFysiologie
 		List<String> teams = new List<String>();
 		FileInfo teamsPath = new FileInfo("teams.csv");
 		FileInfo timesPath = new FileInfo("times.csv");
-		FileInfo resultsPath = new FileInfo("results.csv");
 		Timer timer = new Timer(50);
 		Action<String, long, bool, String, long, bool> updateSW;
 		public MainWindow()
@@ -133,6 +133,7 @@ namespace VredeFysiologie
 				Serial.SendByte((Byte)'s');
 				running = true;
 				startTimeButton.IsEnabled = false;
+				cancelButton.IsEnabled = true;
 			}
 			else
 			{
@@ -159,6 +160,8 @@ namespace VredeFysiologie
 						timer.Stop();
 						bw.showTimes(teamA, sA.ElapsedMilliseconds, teamB, sB.ElapsedMilliseconds);
 						writeTimes(teamA, sA.ElapsedMilliseconds, teamB, sB.ElapsedMilliseconds);
+						startTimeButton.IsEnabled = true;
+						cancelButton.IsEnabled = false;
 					}
 				}				
 			}
@@ -182,9 +185,14 @@ namespace VredeFysiologie
 			bw.Close();
 		}
 
-		private void fightButton_Click(object sender, RoutedEventArgs e)
+		private void cancelButton_Click(object sender, RoutedEventArgs e)
 		{
-			throw new NotImplementedException();
+			running = false;
+			timer.Stop();
+			Serial.SendByte((Byte)'r');
+			startTimeButton.IsEnabled = true;
+			cancelButton.IsEnabled = false;
+			bw.clearTimes();
 		}		
 	}
 }

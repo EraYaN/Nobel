@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VredeFysiologie", "VredeFysiologie\VredeFysiologie.csproj", "{82AAEDF2-4659-4D79-B8BD-15F9358531E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EconomieFysiologie", "EconomieFysiologie\EconomieFysiologie.csproj", "{82AAEDF2-4659-4D79-B8BD-15F9358531E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

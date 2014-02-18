@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace VredeFysiologie
+namespace Nobel
 {
 	/// <summary>
 	/// Interaction logic for BeamerWindow.xaml
@@ -49,6 +49,14 @@ namespace VredeFysiologie
 			teamATime.Foreground = Brushes.Red;
 			teamBTime.Content = String.Format("{1}: {0:F2}", (double)msB / 1000, teamB);
 			teamBTime.Foreground = Brushes.Red;
+		}
+		public void clearTimes()
+		{
+			teamATime.Content = "";
+			teamATime.Foreground = Brushes.White;
+			teamBTime.Content = "";
+			teamBTime.Foreground = Brushes.White;
+			stopwatchLabel.Content = "0.0";
 		}
 		public void updateStopwatch(String teamA, long msA, bool rA, String teamB, long msB, bool rB)
 		{

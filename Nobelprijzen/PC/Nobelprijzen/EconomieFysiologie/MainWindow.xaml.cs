@@ -44,8 +44,8 @@ namespace Nobel
 		Action<int> updatePM;
 		Action startAdt;
 		Action updateDB;
-		DateTime ecoStart = new DateTime(2014, 2, 19, 17, 00, 00);
-		TimeSpan timeslotLen = new TimeSpan(0, 45, 0);
+		DateTime ecoStart = new DateTime(2014, 2, 19, 21, 00, 00);
+		TimeSpan timeslotLen = new TimeSpan(0, 20, 0);
 		object _updaterLock = new object();
 		int totalQueries = 0;
 		String getQuery = @"SELECT 
@@ -157,7 +157,8 @@ WHERE Prijs_Naam LIKE ?product AND Debiteur_Naam IS NOT NULL AND Bestelling_Time
 			lock (_updaterLock)
 			{
 				int current = 0;
-				int tsn = 1;								
+				int tsn = 1;
+                points.Clear();			
 				foreach (Timeslot ts in timeslots)
 				{
 					DateTime start = ecoStart.Add(timeslotLen.Multiply(tsn));
@@ -193,6 +194,9 @@ WHERE Prijs_Naam LIKE ?product AND Debiteur_Naam IS NOT NULL AND Bestelling_Time
 					}
 					tsn++;
 				}
+                var pointsSorted = from entry in points orderby entry.Value descending select entry;
+                points = pointsSorted.ToDictionary(pair => pair.Key, pair => pair.Value);
+
 			}
 		}
 

@@ -15,11 +15,11 @@
 			<Button x:Name="startTimeButton" Content="Start Timer" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.733,2.55" Click="startTimeButton_Click"/>
 			<Button x:Name="cancelButton" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.733,2.55" Click="cancelButton_Click"/>
 		</StackPanel>
-		<TextBox x:Name="serverTextBox" HorizontalAlignment="Left" Height="23" Margin="74,11,0,0" TextWrapping="Wrap" Text="localhost" Width="120" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
+		<TextBox x:Name="serverTextBox" HorizontalAlignment="Left" Height="23" Margin="74,11,0,0" TextWrapping="Wrap" Text="192.168.1.1" Width="120" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
 		<Label Content="Server" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center"/>
-		<TextBox x:Name="userTextBox" HorizontalAlignment="Left" Height="23" Margin="74,39,0,0" TextWrapping="Wrap" Text="root" Width="120" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
+		<TextBox x:Name="userTextBox" HorizontalAlignment="Left" Height="23" Margin="74,39,0,0" TextWrapping="Wrap" Text="barkasread" Width="120" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
 		<Label Content="User" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center"/>
-		<PasswordBox x:Name="passwordBox" HorizontalAlignment="Left" Margin="74,67,0,0" VerticalAlignment="Top" Width="120" Height="23" VerticalContentAlignment="Center" Password="test"/>
+		<PasswordBox x:Name="passwordBox" HorizontalAlignment="Left" Margin="74,67,0,0" VerticalAlignment="Top" Width="120" Height="23" VerticalContentAlignment="Center" Password="lezen"/>
 		<Label Content="Password" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center"/>
 		<TextBox x:Name="databaseTextBox" HorizontalAlignment="Left" Height="23" Margin="74,95,0,0" TextWrapping="Wrap" Text="barkas_1_0_prod" Width="120" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
 		<Label Content="Database" HorizontalAlignment="Left" Margin="11,95,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center"/>

@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Ports;
+using System.Text;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using System.Linq;
 
 namespace Nobel
 {
@@ -26,17 +28,33 @@ namespace Nobel
 		String teamA, teamB;
 		Boolean running = false;
 		Boolean runningPM = false;
+		Dictionary<String, long> points = new Dictionary<string, long>();
+		List<Timeslot> timeslots = new List<Timeslot>();
 		int prematch = TimeoutBeforeStart;
 		List<String> teams = new List<String>();
+		FileInfo timeslotsPath = new FileInfo("timeslots.csv");
 		FileInfo teamsPath = new FileInfo("teams.csv");
 		FileInfo timesPath = new FileInfo("times.csv");
 		Timer timer = new Timer(50);
 		Timer timerPrematch = new Timer(1000);
-		Timer timerDatabase = new Timer(1000);
+		Timer timerDatabase = new Timer(10000);
 		Action<String, long, bool, String, long, bool> updateSW;
 		Action<int> updatePM;
 		Action startAdt;
 		Action updateDB;
+		DateTime ecoStart = new DateTime(2014, 2, 19, 17, 00, 00);
+		TimeSpan timeslotLen = new TimeSpan(0, 45, 0);
+		String getQuery = @"SELECT 
+    SUM(bestelling.Bestelling_AantalS) as Totaal_Aantal, debiteur.Debiteur_Naam, prijs.Prijs_Naam
+FROM
+    bestelling
+        LEFT JOIN
+    (bon
+    LEFT JOIN (debiteur) ON (Bon_Debiteur = Debiteur_ID)) ON (Bestelling_Bon = Bon_ID)
+  LEFT JOIN
+    (prijs) ON (Bestelling_Wat = Prijs_ID)
+WHERE Prijs_Naam LIKE ?product AND Debiteur_Naam IS NOT NULL AND Bestelling_Time>=?timestart AND Bestelling_Time<=?timeend GROUP BY Debiteur_Naam ORDER BY Totaal_Aantal DESC";
+		MySqlCommand getCmd;
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -51,6 +69,50 @@ namespace Nobel
 					teams.Add(r.ReadLine());
 				}
 			}
+			if (timeslotsPath.Exists)
+			{
+				using (StreamReader r = timeslotsPath.OpenText())
+				{
+					timeslots.Clear();
+					timeSlotsListBox.Items.Clear();
+					while (!r.EndOfStream)
+					{
+						String[] strings = r.ReadLine().Split(';');
+						if (strings.Length % 2 != 0)
+						{
+							MessageBox.Show("Error in timeslots file. Format is 1 per line points per unit;unit;points per unit;unit.");
+						}
+						else
+						{
+							Dictionary<String, int> Items = new Dictionary<string, int>();
+							StringBuilder sb = new StringBuilder();
+							for (int i = 0; i < strings.Length; i += 2)
+							{
+								if (strings[i] == "" || strings[i + 1] == "")
+								{
+									MessageBox.Show("Error in timeslots file. Something is emtpy.");
+								}
+								else
+								{
+									int pointsperunit = Int32.Parse(strings[i]);
+									String unit = strings[i + 1].Trim('"');
+									Items.Add(unit, pointsperunit);
+									sb.AppendFormat("{1} ({0}), ", pointsperunit, unit);
+								}
+							}
+
+							timeslots.Add(new Timeslot() { Items = Items });
+
+							timeSlotsListBox.Items.Add(new ListBoxItem() { Content = sb.ToString() });
+							sb = null;
+						}
+					}
+				}
+			}
+			else
+			{
+				MessageBox.Show("No timeslots.csv found.");
+			}
 			foreach (String s in teams)
 			{
 				teamAComboBox.Items.Add(s);
@@ -63,7 +125,7 @@ namespace Nobel
 			timer.Elapsed += timer_Elapsed;
 			timerPrematch.Elapsed += timerPrematch_Elapsed;
 			timerDatabase.Elapsed += timerDatabase_Elapsed;
-			
+
 		}
 
 		void timerDatabase_Elapsed(object sender, ElapsedEventArgs e)
@@ -87,41 +149,44 @@ namespace Nobel
 		void timer_Elapsed(object sender, ElapsedEventArgs e)
 		{
 			if (running)
-			{	
-				g.Dispatcher.BeginInvoke(DispatcherPriority.Send, updateSW, teamA, sA.ElapsedMilliseconds, sA.IsRunning, teamB, sB.ElapsedMilliseconds, sB.IsRunning);				
+			{
+				g.Dispatcher.BeginInvoke(DispatcherPriority.Send, updateSW, teamA, sA.ElapsedMilliseconds, sA.IsRunning, teamB, sB.ElapsedMilliseconds, sB.IsRunning);
 			}
-			
+
 		}
 
 		private void connectButton_Click(object sender, RoutedEventArgs e)
 		{
-			comPort = ((ComboBoxItem)comPortComboBox.SelectedItem).Content.ToString();
-			if (comPort == String.Empty)
-			{
-				MessageBox.Show("Geen comport geselecteerd.");
-				return;
-			}
-			Serial = new SerialInterface(comPort, 115200);
-			Serial.OpenPort();
-			if (Serial.IsOpen)
-			{
-				Serial.SerialDataEvent += Serial_SerialDataEvent;
-				controlsFysiologieStackPanel.IsEnabled = true;
-				connectButton.IsEnabled = false;
-				comPortComboBox.IsEnabled = false;
-			}
-			else
-			{
-				controlsFysiologieStackPanel.IsEnabled = false;
-				connectButton.IsEnabled = true;
-				comPortComboBox.IsEnabled = true;
-			}
 
+			if (comPortComboBox.SelectedItem != null)
+			{
+				comPort = ((ComboBoxItem)comPortComboBox.SelectedItem).Content.ToString();
+				if (comPort == String.Empty)
+				{
+					MessageBox.Show("Geen comport geselecteerd.");
+					return;
+				}
+				Serial = new SerialInterface(comPort, 115200);
+				Serial.OpenPort();
+				if (Serial.IsOpen)
+				{
+					Serial.SerialDataEvent += Serial_SerialDataEvent;
+					controlsFysiologieStackPanel.IsEnabled = true;
+					connectButton.IsEnabled = false;
+					comPortComboBox.IsEnabled = false;
+				}
+				else
+				{
+					controlsFysiologieStackPanel.IsEnabled = false;
+					connectButton.IsEnabled = true;
+					comPortComboBox.IsEnabled = true;
+				}
+			}
 		}
 
 		void Serial_SerialDataEvent(object sender, SerialDataEventArgs e)
 		{
-			handleSerial(e.DataByte);			
+			handleSerial(e.DataByte);
 		}
 
 		private void comPortComboBox_DropDownOpened(object sender, EventArgs e)
@@ -148,7 +213,7 @@ namespace Nobel
 			{
 				runningPM = true;
 				prematch = TimeoutBeforeStart;
-				timerPrematch.Start();				
+				timerPrematch.Start();
 				startTimeButton.IsEnabled = false;
 				cancelButton.IsEnabled = false;
 			}
@@ -163,7 +228,7 @@ namespace Nobel
 			{
 				if (running)
 				{
-					if ((char)b== 'A')
+					if ((char)b == 'A')
 					{
 						sA.Stop();
 					}
@@ -180,19 +245,19 @@ namespace Nobel
 						startTimeButton.IsEnabled = true;
 						cancelButton.IsEnabled = false;
 					}
-				}				
+				}
 			}
-            else
-            {
+			else
+			{
 				Action<Byte> func = handleSerial;
 				g.Dispatcher.Invoke(DispatcherPriority.Normal, func, b);
-            }			
+			}
 		}
 		void writeTimes(String teamA, long msA, String teamB, long msB)
 		{
 			using (StreamWriter w = timesPath.AppendText())
 			{
-				w.WriteLine("\"{0}\";{1};\"{2}\";{3}",teamA,msA,teamB,msB);
+				w.WriteLine("\"{0}\";{1};\"{2}\";{3}", teamA, msA, teamB, msB);
 			}
 		}
 
@@ -200,7 +265,7 @@ namespace Nobel
 		{
 			bw._allowclosing = true;
 			bw.Close();
-			if (connection!=null)
+			if (connection != null)
 			{
 				connection.Close();
 			}
@@ -254,7 +319,7 @@ namespace Nobel
 			{
 				MessageBox.Show("Enter password.");
 				return;
-			}			
+			}
 			csb.Server = serverTextBox.Text;
 			csb.Database = databaseTextBox.Text;
 			csb.UserID = userTextBox.Text;
@@ -271,6 +336,9 @@ namespace Nobel
 				{
 					mysqlConnectButton.IsEnabled = false;
 					timerDatabase.Start();
+					getCmd = new MySqlCommand(getQuery, connection);
+					updateDatabase();
+					//getCmd.Parameters.Add(new MySqlParameter(
 				}
 			}
 			catch (Exception ex)
@@ -280,24 +348,88 @@ namespace Nobel
 		}
 		void updateDatabase()
 		{
-			string query = "SELECT * FROM prijs LIMIT 10;";
-			//Create Command
-			MySqlCommand cmd = new MySqlCommand(query, connection);
-			//Create a data reader and Execute the command
-			MySqlDataReader dataReader = cmd.ExecuteReader();
-			//Read the data and store them in the list
-			barItemsListBox.Items.Clear();
-			while (dataReader.Read())
+			int tsn = 1;
+			foreach (Timeslot ts in timeslots)
 			{
-				barItemsListBox.Items.Add(new BarItem() { Name = dataReader["Prijs_Naam"].ToString(), Selected = false});
+				DateTime start = ecoStart.Add(timeslotLen.Multiply(tsn));
+				DateTime end = ecoStart.Add(timeslotLen.Multiply(tsn + 1));
+				if (start > DateTime.Now)
+				{
+					continue;
+				}
+				foreach (KeyValuePair<String, int> kvp in ts.Items)
+				{
+					getCmd.Parameters.Clear();
+					getCmd.Parameters.AddWithValue("product", kvp.Key);
+					getCmd.Parameters.AddWithValue("timestart", start.ToUnixTimestamp() * 1000);
+					getCmd.Parameters.AddWithValue("timeend", end.ToUnixTimestamp() * 1000);
+					MySqlDataReader dataReader = getCmd.ExecuteReader();
+					while (dataReader.Read())
+					{
+						String deb = dataReader["Debiteur_Naam"].ToString();
+						String item = dataReader["Prijs_Naam"].ToString();
+						int aantal = Int32.Parse(dataReader["Totaal_Aantal"].ToString());
+						if (points.ContainsKey(deb))
+						{
+							points[deb] += kvp.Value * aantal;
+						}
+						else
+						{
+							points.Add(deb, kvp.Value * aantal);
+						}
+					}
+					dataReader.Close();
+				}
+				tsn++;
 			}
-			//close Data Reader
-			dataReader.Close();
+			var pointsSorted = from entry in points orderby entry.Value descending select entry;
+			points = pointsSorted.ToDictionary(pair => pair.Key, pair => pair.Value);
+			bw.updateScroller(ref points);
+			bw.updateTimeslots(ref timeslots, ecoStart, timeslotLen);
 		}
 	}
-	class BarItem
+	public class Timeslot
 	{
-		public string Name;
-		public bool Selected;
+		public Dictionary<String,int> Items;
+	}
+	public static class DateTimeExtensions
+	{
+		public static long ToUnixTimestamp(this DateTime d)
+		{
+			var duration = d - new DateTime(1970, 1, 1, 0, 0, 0);
+
+			return (long)duration.TotalSeconds;
+		}
+	}
+	public static class TimeSpanExtension
+	{
+		/// <summary>
+		/// Multiplies a timespan by an integer value
+		/// </summary>
+		public static TimeSpan Multiply(this TimeSpan multiplicand, int multiplier)
+		{
+			return TimeSpan.FromTicks(multiplicand.Ticks * multiplier);
+		}
+
+		/// <summary>
+		/// Multiplies a timespan by a double value
+		/// </summary>
+		public static TimeSpan Multiply(this TimeSpan multiplicand, double multiplier)
+		{
+			return TimeSpan.FromTicks((long)(multiplicand.Ticks * multiplier));
+		}
+	}
+	public static class StringExtension
+	{
+		public static string UppercaseFirst(this string s)
+		{
+			// Check for empty string.
+			if (string.IsNullOrEmpty(s))
+			{
+				return string.Empty;
+			}
+			// Return char and concat substring.
+			return char.ToUpper(s[0]) + s.Substring(1);
+		}
 	}
 }

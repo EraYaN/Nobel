@@ -113,7 +113,7 @@ namespace Nobel
 			{
 				timeslot = (int)(ts.Ticks / timeslotLen.Ticks);
 			}
-			if (timeslots[timeslot] != null && ts > TimeSpan.Zero)
+			if (timeslot >= 0 && timeslot < timeslots.Count && ts > TimeSpan.Zero)
 			{
 				StringBuilder sb = new StringBuilder();
 				bool first = true;
@@ -123,7 +123,7 @@ namespace Nobel
 					{
 						sb.Append(" & ");
 					}
-					sb.Append(kvp.Key.Trim('%').UppercaseFirst());
+					sb.AppendFormat("{0} ({1})",kvp.Key.Trim('%').UppercaseFirst(),kvp.Value);
 					first = false;
 				}
 				currentTimeslot.Text = "Nu: " + sb.ToString();
@@ -137,7 +137,7 @@ namespace Nobel
 			{
 				timeslot = -1;
 			}
-			if (timeslots[timeslot+1] != null)
+			if (timeslot+1 >= 0 && timeslot+1 < timeslots.Count)
 			{
 				StringBuilder sb = new StringBuilder();
 				bool first = true;
@@ -147,7 +147,7 @@ namespace Nobel
 					{
 						sb.Append(" & ");
 					}
-					sb.Append(kvp.Key.Trim('%').UppercaseFirst());
+					sb.AppendFormat("{0} ({1})", kvp.Key.Trim('%').UppercaseFirst(), kvp.Value);
 					first = false;
 				}
 				nextTimeslot.Text = "Straks: " + sb.ToString();

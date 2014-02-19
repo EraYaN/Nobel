@@ -41,11 +41,11 @@
 			</Canvas.Resources>
 			<StackPanel HorizontalAlignment="Stretch" Name="upScroller" >
 				<TextBlock TextWrapping="Wrap" Text="Verbind met de MySQL server.."/>
-				
+
 			</StackPanel>
 
-		</Canvas>
 
+		</Canvas>		
 
 	</Grid>
 </Window>

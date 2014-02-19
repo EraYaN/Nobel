@@ -25,8 +25,9 @@
 		<Label Content="Database" HorizontalAlignment="Left" Margin="11,95,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center"/>
 		<Button x:Name="mysqlConnectButton" Content="Connect" HorizontalAlignment="Left" Margin="11,123,0,0" VerticalAlignment="Top" Width="75" Click="mysqlConnectButton_Click"/>
 		<ListBox x:Name="timeSlotsListBox" HorizontalAlignment="Left" Height="139" Margin="199,11,0,0" VerticalAlignment="Top" Width="310">
-			
+
 		</ListBox>
+		<ProgressBar x:Name="updaterProgress" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="103" Margin="91,123,0,0"/>
 
 
 

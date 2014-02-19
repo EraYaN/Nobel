@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using System.Linq;
+using System.ComponentModel;
 
 namespace Nobel
 {
@@ -19,6 +20,7 @@ namespace Nobel
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		BackgroundWorker updater = new BackgroundWorker();
 		const int TimeoutBeforeStart = 4;
 		MySqlConnection connection;
 		BeamerWindow bw = new BeamerWindow();
@@ -37,13 +39,15 @@ namespace Nobel
 		FileInfo timesPath = new FileInfo("times.csv");
 		Timer timer = new Timer(50);
 		Timer timerPrematch = new Timer(1000);
-		Timer timerDatabase = new Timer(10000);
+		Timer timerDatabase = new Timer(30000);
 		Action<String, long, bool, String, long, bool> updateSW;
 		Action<int> updatePM;
 		Action startAdt;
 		Action updateDB;
 		DateTime ecoStart = new DateTime(2014, 2, 19, 17, 00, 00);
 		TimeSpan timeslotLen = new TimeSpan(0, 45, 0);
+		object _updaterLock = new object();
+		int totalQueries = 0;
 		String getQuery = @"SELECT 
     SUM(bestelling.Bestelling_AantalS) as Totaal_Aantal, debiteur.Debiteur_Naam, prijs.Prijs_Naam
 FROM
@@ -97,6 +101,7 @@ WHERE Prijs_Naam LIKE ?product AND Debiteur_Naam IS NOT NULL AND Bestelling_Time
 									int pointsperunit = Int32.Parse(strings[i]);
 									String unit = strings[i + 1].Trim('"');
 									Items.Add(unit, pointsperunit);
+									totalQueries++;
 									sb.AppendFormat("{1} ({0}), ", pointsperunit, unit);
 								}
 							}
@@ -125,7 +130,70 @@ WHERE Prijs_Naam LIKE ?product AND Debiteur_Naam IS NOT NULL AND Bestelling_Time
 			timer.Elapsed += timer_Elapsed;
 			timerPrematch.Elapsed += timerPrematch_Elapsed;
 			timerDatabase.Elapsed += timerDatabase_Elapsed;
+			updater.DoWork += updater_DoWork;
+			updater.ProgressChanged += updater_ProgressChanged;
+			updater.RunWorkerCompleted += updater_RunWorkerCompleted;
+			updater.WorkerReportsProgress = true;
 
+		}
+
+		void updater_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+		{
+			lock (_updaterLock)
+			{
+				bw.updateScroller(ref points);
+			}
+			bw.updateTimeslots(ref timeslots, ecoStart, timeslotLen);
+			
+		}
+
+		void updater_ProgressChanged(object sender, ProgressChangedEventArgs e)
+		{
+			updaterProgress.Value = e.ProgressPercentage;
+		}
+
+		void updater_DoWork(object sender, DoWorkEventArgs e)
+		{
+			lock (_updaterLock)
+			{
+				int current = 0;
+				int tsn = 1;								
+				foreach (Timeslot ts in timeslots)
+				{
+					DateTime start = ecoStart.Add(timeslotLen.Multiply(tsn));
+					DateTime end = ecoStart.Add(timeslotLen.Multiply(tsn + 1));
+					if (start > DateTime.Now)
+					{
+						continue;
+					}
+					foreach (KeyValuePair<String, int> kvp in ts.Items)
+					{
+						updater.ReportProgress((int)Math.Round(current / (double)totalQueries * 100.0));
+						getCmd.Parameters.Clear();
+						getCmd.Parameters.AddWithValue("product", kvp.Key);
+						getCmd.Parameters.AddWithValue("timestart", start.ToUnixTimestamp() * 1000);
+						getCmd.Parameters.AddWithValue("timeend", end.ToUnixTimestamp() * 1000);
+						MySqlDataReader dataReader = getCmd.ExecuteReader();
+						while (dataReader.Read())
+						{
+							String deb = dataReader["Debiteur_Naam"].ToString();
+							String item = dataReader["Prijs_Naam"].ToString();
+							int aantal = Int32.Parse(dataReader["Totaal_Aantal"].ToString());
+							if (points.ContainsKey(deb))
+							{
+								points[deb] += kvp.Value * aantal;
+							}
+							else
+							{
+								points.Add(deb, kvp.Value * aantal);
+							}
+						}
+						dataReader.Close();
+						current++;
+					}
+					tsn++;
+				}
+			}
 		}
 
 		void timerDatabase_Elapsed(object sender, ElapsedEventArgs e)
@@ -348,7 +416,7 @@ WHERE Prijs_Naam LIKE ?product AND Debiteur_Naam IS NOT NULL AND Bestelling_Time
 		}
 		void updateDatabase()
 		{
-			int tsn = 1;
+			/*int tsn = 1;
 			foreach (Timeslot ts in timeslots)
 			{
 				DateTime start = ecoStart.Add(timeslotLen.Multiply(tsn));
@@ -385,7 +453,11 @@ WHERE Prijs_Naam LIKE ?product AND Debiteur_Naam IS NOT NULL AND Bestelling_Time
 			var pointsSorted = from entry in points orderby entry.Value descending select entry;
 			points = pointsSorted.ToDictionary(pair => pair.Key, pair => pair.Value);
 			bw.updateScroller(ref points);
-			bw.updateTimeslots(ref timeslots, ecoStart, timeslotLen);
+			bw.updateTimeslots(ref timeslots, ecoStart, timeslotLen);*/
+			if (!updater.IsBusy)
+			{
+				updater.RunWorkerAsync();
+			}
 		}
 	}
 	public class Timeslot

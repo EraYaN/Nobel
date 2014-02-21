@@ -41,7 +41,7 @@ namespace Nobel
 		Timer timerPrematch = new Timer(1000);
 		Timer timerDatabase = new Timer(30000);
 		Action<String, long, bool, String, long, bool> updateSW;
-		Action<int> updatePM;
+		Action<int, String, String> updatePM;
 		Action startAdt;
 		Action updateDB;
 		DateTime ecoStart = new DateTime(2014, 2, 19, 21, 00, 00);
@@ -143,8 +143,7 @@ WHERE Prijs_Naam LIKE ?product AND Debiteur_Naam IS NOT NULL AND Bestelling_Time
 			{
 				bw.updateScroller(ref points);
 			}
-			bw.updateTimeslots(ref timeslots, ecoStart, timeslotLen);
-			
+					
 		}
 
 		void updater_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -210,7 +209,7 @@ WHERE Prijs_Naam LIKE ?product AND Debiteur_Naam IS NOT NULL AND Bestelling_Time
 			if (runningPM)
 			{
 				prematch--;
-				g.Dispatcher.BeginInvoke(DispatcherPriority.Send, updatePM, prematch);
+				g.Dispatcher.BeginInvoke(DispatcherPriority.Send, updatePM, prematch, teamA, teamB);
 				if (prematch == 0)
 				{
 					g.Dispatcher.BeginInvoke(DispatcherPriority.Send, startAdt);
@@ -420,48 +419,11 @@ WHERE Prijs_Naam LIKE ?product AND Debiteur_Naam IS NOT NULL AND Bestelling_Time
 		}
 		void updateDatabase()
 		{
-			/*int tsn = 1;
-			foreach (Timeslot ts in timeslots)
-			{
-				DateTime start = ecoStart.Add(timeslotLen.Multiply(tsn));
-				DateTime end = ecoStart.Add(timeslotLen.Multiply(tsn + 1));
-				if (start > DateTime.Now)
-				{
-					continue;
-				}
-				foreach (KeyValuePair<String, int> kvp in ts.Items)
-				{
-					getCmd.Parameters.Clear();
-					getCmd.Parameters.AddWithValue("product", kvp.Key);
-					getCmd.Parameters.AddWithValue("timestart", start.ToUnixTimestamp() * 1000);
-					getCmd.Parameters.AddWithValue("timeend", end.ToUnixTimestamp() * 1000);
-					MySqlDataReader dataReader = getCmd.ExecuteReader();
-					while (dataReader.Read())
-					{
-						String deb = dataReader["Debiteur_Naam"].ToString();
-						String item = dataReader["Prijs_Naam"].ToString();
-						int aantal = Int32.Parse(dataReader["Totaal_Aantal"].ToString());
-						if (points.ContainsKey(deb))
-						{
-							points[deb] += kvp.Value * aantal;
-						}
-						else
-						{
-							points.Add(deb, kvp.Value * aantal);
-						}
-					}
-					dataReader.Close();
-				}
-				tsn++;
-			}
-			var pointsSorted = from entry in points orderby entry.Value descending select entry;
-			points = pointsSorted.ToDictionary(pair => pair.Key, pair => pair.Value);
-			bw.updateScroller(ref points);
-			bw.updateTimeslots(ref timeslots, ecoStart, timeslotLen);*/
 			if (!updater.IsBusy)
 			{
 				updater.RunWorkerAsync();
 			}
+            bw.updateTimeslots(ref timeslots, ecoStart, timeslotLen);
 		}
 	}
 	public class Timeslot

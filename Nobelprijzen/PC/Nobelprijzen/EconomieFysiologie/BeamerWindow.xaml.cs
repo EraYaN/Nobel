@@ -61,14 +61,14 @@ namespace Nobel
 			teamBTime.Foreground = Brushes.White;
 			stopwatchLabel.Content = "0.0";
 		}
-		public void updatePrematch(int sPM)
+		public void updatePrematch(int sPM, String teamA, String teamB)
 		{
 			stopwatchLabel.Content = String.Format("{0:N0}", sPM);
 
-			teamATime.Content = "Klaar?";
+            teamATime.Content = String.Format("{0} klaar?", teamA);
 			teamATime.Foreground = Brushes.White;
 
-			teamBTime.Content = "Klaar?";
+            teamBTime.Content = String.Format("{0} klaar?", teamB);
 			teamBTime.Foreground = Brushes.White;
 
 		}
@@ -84,7 +84,7 @@ namespace Nobel
 			}
 			else
 			{
-				teamATime.Content = "Adten!!";
+				teamATime.Content = String.Format("{0} adten!!", teamA);
 				teamATime.Foreground = Brushes.White;
 			}
 			if (!rB)
@@ -94,7 +94,7 @@ namespace Nobel
 			}
 			else
 			{
-				teamBTime.Content = "Adten!!";
+                teamBTime.Content = String.Format("{0} adten!!", teamB);
 				teamBTime.Foreground = Brushes.White;
 			}
 

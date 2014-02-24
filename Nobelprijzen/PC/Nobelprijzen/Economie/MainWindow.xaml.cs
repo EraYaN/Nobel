@@ -32,8 +32,8 @@ namespace Nobel
 		Action updateDB;
 		//DateTime ecoStart = new DateTime(2013, 9, 18, 19, 00, 00);
        // DateTime ecoEnd = new DateTime(2013, 9, 19, 8, 00, 00);
-        DateTime ecoStart = new DateTime(2014, 2, 23, 19, 00, 00);
-        DateTime ecoEnd = new DateTime(2014, 2, 24, 8, 00, 00);
+        DateTime ecoStart = new DateTime(2014, 2, 24, 17, 00, 00);
+        DateTime ecoEnd = new DateTime(2014, 2, 25, 8, 00, 00);
 		TimeSpan timeslotLen = new TimeSpan(0, 30, 0);
 		object _updaterLock = new object();
 		int totalQueries = 0;
@@ -123,7 +123,10 @@ WHERE Prijs_Naam LIKE ?product AND Bestelling_Time>=?timestart AND Bestelling_Ti
                             {
                                 int pointsperunit = Int32.Parse(strings[0]);
                                 String unit = strings[1].Trim('"');
-                                pointSources.Add(unit, pointsperunit);
+                                if (!pointSources.ContainsKey(unit))
+                                {
+                                    pointSources.Add(unit, pointsperunit);
+                                }
                                 totalQueries++;
                                 pointSourcesListBox.Items.Add(new ListBoxItem() { Content = String.Format("{1} ({0})", pointsperunit, unit) });
                             }
@@ -166,7 +169,7 @@ WHERE Prijs_Naam LIKE ?product AND Bestelling_Time>=?timestart AND Bestelling_Ti
 			lock (_updaterLock)
 			{
 				int current = 0;
-				int tsn = 1;
+				int tsn = 0;
                 points.Clear();
                 //stuff that gets you points the whole evening.
                 getCmd.Parameters["timestart"].Value = ecoStart.ToUnixTimestamp() * 1000;
@@ -213,7 +216,7 @@ WHERE Prijs_Naam LIKE ?product AND Bestelling_Time>=?timestart AND Bestelling_Ti
 					DateTime end = ecoStart.Add(timeslotLen.Multiply(tsn + 1));
                     if (start > DateTime.Now || start > ecoEnd)
 					{
-						continue;
+                        continue;
 					}
                     getCmd.Parameters["timestart"].Value = start.ToUnixTimestamp() * 1000;
                     getCmd.Parameters["timeend"].Value = end.ToUnixTimestamp() * 1000;
@@ -222,7 +225,7 @@ WHERE Prijs_Naam LIKE ?product AND Bestelling_Time>=?timestart AND Bestelling_Ti
                         updater.ReportProgress((int)Math.Round(current / (double)totalQueries * 100.0));
                         try
                         {
-                            getCmd.Parameters["product"].Value = kvp.Key;                            
+                            getCmd.Parameters["product"].Value = kvp.Key;
                             using (MySqlDataReader dataReader = getCmd.ExecuteReader())
                             {
                                 while (dataReader.Read())
@@ -345,6 +348,7 @@ WHERE Prijs_Naam LIKE ?product AND Bestelling_Time>=?timestart AND Bestelling_Ti
         {
             outputTextBox.AppendText(String.Format("{0:HH:mm:ss} -> {1}.", DateTime.Now, text));
             outputTextBox.AppendText(Environment.NewLine);
+            outputTextBox.ScrollToEnd();
         }
 		void updateDatabase()
 		{
@@ -371,7 +375,7 @@ WHERE Prijs_Naam LIKE ?product AND Bestelling_Time>=?timestart AND Bestelling_Ti
 	{
 		public static long ToUnixTimestamp(this DateTime d)
 		{
-			var duration = d - new DateTime(1970, 1, 1, 0, 0, 0);
+			var duration = d.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0); //Make GMT timestamps.
 
 			return (long)duration.TotalSeconds;
 		}

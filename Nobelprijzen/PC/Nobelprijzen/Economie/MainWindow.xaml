@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Nobelprijzen Economie door Erwin de Haan - Main Window" Height="370" Width="525" ResizeMode="NoResize" Closing="Window_Closing">
     <Grid x:Name="g">
-        <TextBox x:Name="serverTextBox" HorizontalAlignment="Left" Height="23" Margin="74,11,0,0" TextWrapping="Wrap" Text="localhost" Width="120" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
+        <TextBox x:Name="serverTextBox" HorizontalAlignment="Left" Height="23" Margin="74,11,0,0" TextWrapping="Wrap" Text="192.168.1.1" Width="120" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
         <Label Content="Server" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center" Target="{Binding ElementName=serverTextBox, Mode=OneWay}"/>
         <TextBox x:Name="userTextBox" HorizontalAlignment="Left" Height="23" Margin="74,39,0,0" TextWrapping="Wrap" Text="barkasread" Width="120" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
         <Label Content="User" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center" Target="{Binding ElementName=userTextBox, Mode=OneWay}"/>

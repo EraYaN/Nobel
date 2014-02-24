@@ -12,7 +12,7 @@
         <Style x:Key="BeamerText" TargetType="Label">
             <Setter Property="Foreground" Value="White" />
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontSize" Value="48" />
             <Setter Property="Padding" Value="0"/>
         </Style>
     </Window.Resources>
@@ -21,30 +21,30 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Canvas ClipToBounds="True" Name="canUp" Background="Black" Margin="159,36,10,10">
+        <Canvas ClipToBounds="True" Name="canUp" Background="Transparent" Margin="220,36,10,10">
             <Canvas.Resources>
                 <Style TargetType="{x:Type Grid}">
                     <Setter Property="Width" Value="{Binding ActualWidth, ElementName=canUp, Mode=OneWay}" />
                 </Style>
             </Canvas.Resources>
-            <StackPanel Width="{Binding ActualWidth, ElementName=canUp, Mode=OneWay}" Name="upScroller" >
-                <Grid HorizontalAlignment="Stretch">
+            <StackPanel Width="{Binding ActualWidth, ElementName=canUp, Mode=OneWay}" Name="upScroller" Background="Transparent">
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <Label HorizontalAlignment="Stretch" Content="Niet verbonden" Margin="20,0,50,0" Style="{StaticResource BeamerText}"/>
                 </Grid>
             </StackPanel>
 
 
         </Canvas>
-        <StackPanel x:Name="stackPanel" Margin="10,36,0,10" HorizontalAlignment="Left" Width="144">
+        <StackPanel x:Name="stackPanel" Margin="10,36,0,10" HorizontalAlignment="Left" Width="205">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Label}" BasedOn="{StaticResource ResourceKey=BeamerText}">
-                    <Setter Property="FontSize" Value="15"/>
+                    <Setter Property="FontSize" Value="22"/>
                 </Style>
             </StackPanel.Resources>
 
         </StackPanel>
-        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Drank (punten)" VerticalAlignment="Top" Height="21" Width="144" FontSize="18"/>
-        <TextBlock Margin="159,10,10,0" TextWrapping="Wrap" Text="Stand" VerticalAlignment="Top" Height="21" FontSize="18"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Drank (punten)" VerticalAlignment="Top" Height="21" Width="205" FontSize="18"/>
+        <TextBlock Margin="220,10,10,0" TextWrapping="Wrap" Text="Stand" VerticalAlignment="Top" Height="21" FontSize="18"/>
 
     </Grid>
 </Window>

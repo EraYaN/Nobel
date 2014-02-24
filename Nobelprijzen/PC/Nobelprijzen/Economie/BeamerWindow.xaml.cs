@@ -37,6 +37,7 @@ namespace Nobel
 					WindowState = System.Windows.WindowState.Normal;
 					ResizeMode = System.Windows.ResizeMode.CanResize;
 				}
+                checkAnimation();
 			}
 
 		}		
@@ -74,9 +75,10 @@ namespace Nobel
 				timeslot = -1;
 			}
             TimeSpan timeToNext = ecoStart.Add(timeslotLen.Multiply(timeslot + 1)).Subtract(DateTime.Now);
+            string minleft = timeToNext.TotalMinutes < 0.5 ? "<1" : timeToNext.TotalMinutes.ToString("F0");
 			if (timeslot+1 >= 0 && timeslot+1 < timeslots.Count)
 			{
-                stackPanel.Children.Add(new Label() { Content = String.Format("Straks (nog {0:F0} min)", timeToNext.TotalMinutes), FontWeight = FontWeights.Bold });				
+                stackPanel.Children.Add(new Label() { Content = String.Format("Straks (nog {0} min)", minleft), FontWeight = FontWeights.Bold });				
 				foreach (KeyValuePair<String, int> kvp in timeslots[timeslot + 1].Items)
 				{
                     stackPanel.Children.Add(new Label() { Content = String.Format("{0} ({1})", kvp.Key.Trim('%').UppercaseFirst(), kvp.Value) });
@@ -93,15 +95,12 @@ namespace Nobel
 				foreach (KeyValuePair<String, long> kvp in points)
 				{
                     Grid grid = new Grid() { Width = canUp.ActualWidth};
-                    /*TextBlock tb = new TextBlock();
-					tb.Text = String.Format("{0,3}: {1,-30} met {2,5} punten.",i,kvp.Key,kvp.Value);
-					upScroller.Children.Add(tb);*/
                     Label tbPos = new Label()
                     {
                         Content = i.ToString(),
                         HorizontalAlignment = System.Windows.HorizontalAlignment.Left,
                         HorizontalContentAlignment = System.Windows.HorizontalAlignment.Right,
-                        Width = 30,
+                        Width = 50,
                         Style = (Style)(this.Resources["BeamerText"])
                     };
                     Label tbPoints = new Label()
@@ -109,7 +108,7 @@ namespace Nobel
                         Content = kvp.Value.ToString(),
                         HorizontalAlignment = System.Windows.HorizontalAlignment.Right,
                         HorizontalContentAlignment = System.Windows.HorizontalAlignment.Right,
-                        Width = 50,
+                        Width = 75,
                         Style = (Style)(this.Resources["BeamerText"])
                     };
                     String name = kvp.Key;
@@ -135,8 +134,7 @@ namespace Nobel
                     upScroller.Children.Add(grid);
 					i++;
 				}
-				upScroller.UpdateLayout();
-				
+				upScroller.UpdateLayout();				
 			}
 			else
 			{
@@ -144,41 +142,17 @@ namespace Nobel
 				tb.Text = "Er is nog geen data.";
 				upScroller.Children.Add(tb);
 			}
-			if (upScroller.ActualHeight > canUp.ActualHeight && lastCount < points.Count)
-			{
-				updateAnimation();
-			}
-			if (upScroller.ActualHeight <= canUp.ActualHeight)
-			{
-				stopAnimation();
-			}
+            checkAnimation();
 			lastCount = points.Count;
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			if (upScroller.ActualHeight > canUp.ActualHeight)
-			{
-				updateAnimation();
-			}
-			if (upScroller.ActualHeight <= canUp.ActualHeight)
-			{
-				stopAnimation();
-			}		
+            checkAnimation();		
 		}
 		public void updateAnimation(){
-			/*DoubleAnimation doubleAnimationUp = new DoubleAnimation();
-			doubleAnimationUp.From = 0;
-			doubleAnimationUp.To = canUp.ActualHeight-upScroller.ActualHeight;
-            doubleAnimationUp.AutoReverse = true;
-
-            doubleAnimationUp.EasingFunction = new SineEase();
-
-            doubleAnimationUp.RepeatBehavior = RepeatBehavior.Forever;
-			doubleAnimationUp.Duration = new Duration(TimeSpan.FromSeconds(Math.Abs(doubleAnimationUp.To.Value - doubleAnimationUp.From.Value) / 200));
-			upScroller.BeginAnimation(Canvas.TopProperty, doubleAnimationUp);*/
-            double from = 0.0;
-            double to = canUp.ActualHeight-upScroller.ActualHeight;
+			double from = 0.0;
+            double to = Math.Min(0,canUp.ActualHeight-upScroller.ActualHeight);
             DoubleAnimationUsingKeyFrames DA = new DoubleAnimationUsingKeyFrames();
             DA.KeyFrames.Add(new LinearDoubleKeyFrame(from,KeyTime.FromPercent(0)));
             DA.KeyFrames.Add(new LinearDoubleKeyFrame(to, KeyTime.FromPercent(.35)));
@@ -190,20 +164,27 @@ namespace Nobel
             upScroller.BeginAnimation(Canvas.TopProperty, DA);
 		}
 		public void stopAnimation()
-		{			
-			upScroller.BeginAnimation(Canvas.BottomProperty, null);
+		{
+            upScroller.BeginAnimation(Canvas.TopProperty, null);
 		}
 
 		private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			if (upScroller.ActualHeight > canUp.ActualHeight)
-			{
-				updateAnimation();
-			}
-			if (upScroller.ActualHeight <= canUp.ActualHeight)
-			{
-				stopAnimation();
-			}
+            checkAnimation();
 		}
+
+        private void checkAnimation()
+        {
+            canUp.UpdateLayout();
+            upScroller.UpdateLayout();
+            if (upScroller.ActualHeight > canUp.ActualHeight)
+            {
+                updateAnimation();
+            }
+            else
+            {
+                stopAnimation();
+            }
+        }
 	}
 }

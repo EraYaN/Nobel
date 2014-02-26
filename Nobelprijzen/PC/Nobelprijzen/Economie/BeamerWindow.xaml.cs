@@ -142,7 +142,10 @@ namespace Nobel
 				tb.Text = "Er is nog geen data.";
 				upScroller.Children.Add(tb);
 			}
-            checkAnimation();
+            if (lastCount != points.Count)
+            {
+                checkAnimation();
+            }
 			lastCount = points.Count;
 		}
 
@@ -155,12 +158,12 @@ namespace Nobel
             double to = Math.Min(0,canUp.ActualHeight-upScroller.ActualHeight);
             DoubleAnimationUsingKeyFrames DA = new DoubleAnimationUsingKeyFrames();
             DA.KeyFrames.Add(new LinearDoubleKeyFrame(from,KeyTime.FromPercent(0)));
-            DA.KeyFrames.Add(new LinearDoubleKeyFrame(to, KeyTime.FromPercent(.35)));
-            DA.KeyFrames.Add(new LinearDoubleKeyFrame(to, KeyTime.FromPercent(.45)));
-            DA.KeyFrames.Add(new LinearDoubleKeyFrame(from, KeyTime.FromPercent(.90)));
+            DA.KeyFrames.Add(new LinearDoubleKeyFrame(to, KeyTime.FromPercent(.37)));
+            DA.KeyFrames.Add(new LinearDoubleKeyFrame(to, KeyTime.FromPercent(.43)));
+            DA.KeyFrames.Add(new LinearDoubleKeyFrame(from, KeyTime.FromPercent(.94)));
             DA.KeyFrames.Add(new LinearDoubleKeyFrame(from, KeyTime.FromPercent(1)));
             DA.RepeatBehavior = RepeatBehavior.Forever;
-            DA.Duration = new Duration(TimeSpan.FromSeconds(Math.Abs(to-from) / 10));
+            DA.Duration = new Duration(TimeSpan.FromSeconds(Math.Abs(to-from) / 15));
             upScroller.BeginAnimation(Canvas.TopProperty, DA);
 		}
 		public void stopAnimation()

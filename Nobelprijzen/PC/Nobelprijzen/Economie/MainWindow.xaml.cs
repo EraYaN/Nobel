@@ -32,8 +32,8 @@ namespace Nobel
 		Action updateDB;
 		//DateTime ecoStart = new DateTime(2013, 9, 18, 19, 00, 00);
        // DateTime ecoEnd = new DateTime(2013, 9, 19, 8, 00, 00);
-        DateTime ecoStart = new DateTime(2014, 2, 24, 17, 00, 00);
-        DateTime ecoEnd = new DateTime(2014, 2, 25, 8, 00, 00);
+        DateTime ecoStart = new DateTime(2014, 2, 26, 17, 00, 00);
+        DateTime ecoEnd = new DateTime(2014, 2, 27, 0, 00, 00);
 		TimeSpan timeslotLen = new TimeSpan(0, 30, 0);
 		object _updaterLock = new object();
 		int totalQueries = 0;

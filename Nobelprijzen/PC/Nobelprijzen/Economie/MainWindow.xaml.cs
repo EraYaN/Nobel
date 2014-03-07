@@ -187,6 +187,10 @@ WHERE Prijs_Naam LIKE ?product AND Bestelling_Time>=?timestart AND Bestelling_Ti
                                 String deb = dataReader["Debiteur_Naam"].ToString();
                                 String item = dataReader["Prijs_Naam"].ToString();
                                 int aantal = Int32.Parse(dataReader["Totaal_Aantal"].ToString());
+                                if (item.Contains("fles", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    aantal *= 20;
+                                }
                                 if (points.ContainsKey(deb))
                                 {
                                     points[deb] += kvp.Value * aantal;
@@ -233,6 +237,10 @@ WHERE Prijs_Naam LIKE ?product AND Bestelling_Time>=?timestart AND Bestelling_Ti
                                     String deb = dataReader["Debiteur_Naam"].ToString();
                                     String item = dataReader["Prijs_Naam"].ToString();
                                     int aantal = Int32.Parse(dataReader["Totaal_Aantal"].ToString());
+                                    if (item.Contains("fles", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        aantal *= 20;
+                                    }
                                     if (points.ContainsKey(deb))
                                     {
                                         points[deb] += kvp.Value * aantal;
@@ -410,5 +418,9 @@ WHERE Prijs_Naam LIKE ?product AND Bestelling_Time>=?timestart AND Bestelling_Ti
 			// Return char and concat substring.
 			return char.ToUpper(s[0]) + s.Substring(1);
 		}
+        public static bool Contains(this string source, string toCheck, StringComparison comp)
+        {
+            return source.IndexOf(toCheck, comp) >= 0;
+        }
 	}
 }

@@ -1,0 +1,4 @@
+ErrorDocument 403 /403.php
+order deny,allow
+deny from all
+allow from 5354A349.cm-6-5c.dynamic.ziggo.nl

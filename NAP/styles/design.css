@@ -1,0 +1,50 @@
+/* CSS Document */
+body{
+	padding-top: 48px;
+	padding-bottom: 0px;
+}
+.menubar{
+	width:100%;
+	height: 48px;
+	padding-left: 48px;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+}
+.menubar ul{
+	list-style: none;
+	padding: 0px;
+	margin: 0px;
+}
+.menubar ul li{
+	padding: 10px;
+	margin: 0px;
+	position: relative;
+	float:left;
+	display:inline;
+	left: 5px;
+	top: 0px;
+	height: 28px;
+	text-align: center;
+}
+.menubar ul li a
+{
+	display:block;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+.logo256{
+	float:left;
+	height: 256px;
+	width: 256px;
+	margin-right: 40px;
+}
+.title{
+	padding-top:56px;
+	margin-top:10px;
+	margin-bottom:0px;	
+}
+.subtitle{
+	padding-top:0px; margin-top:10px;
+}

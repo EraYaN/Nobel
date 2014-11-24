@@ -1,0 +1,88 @@
+body, html {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+}
+
+h1 {
+	margin: 0;
+}
+
+h2 {
+	font-size: 20px;
+}
+
+#sidebar {
+	float: left;
+	padding: 0 20px;
+	margin-right: 20px;
+	border-right: 1px dashed black;
+	min-height: 100%;
+	width: 160px;
+}
+
+#sidebar a {
+	font-size: 15px;
+	display: block;
+}
+
+table td {
+	padding: 2px;
+	padding-right: 10px;
+}
+
+tr.table_sum {
+	border-top: 1px solid black;
+}
+
+input.small {
+	width: 100px;
+}
+
+#content_wrapper {
+	float: left;
+	margin-right: auto;
+	width: 500px;
+}
+
+table.data tr:nth-child(1) {
+	font-weight: bold;
+}
+table.data tr:nth-child(even) {
+	background-color: #EEE;
+}
+table.data input,
+table.data select {
+	background: transparent;
+	border: 1px solid gray;
+	padding: 2px 1px;
+}
+
+table.dbv > thead > tr {
+	font-weight: bold;
+}
+table.dbv > tbody > tr:nth-child(odd) {
+	background-color: #EEE;
+}
+table.dbv > input,
+table.dbv > select {
+	background: transparent;
+	border: 1px solid gray;
+	padding: 2px 1px;
+}
+
+table.afrekening tr.afrekening_1 {
+	font-weight: bold;
+	border-top: 2px solid black;
+	border-bottom: 2px solid black;
+}
+table.afrekening tr.afrekening_2 {
+	border-bottom: 1px solid black;
+}
+table.afrekening tr.afrekening_3 td:nth-child(1) {
+	padding-left: 20px;
+	font-style: italic;
+}
+table.afrekening td:nth-child(2n+1) {
+	border-right: 1px solid black;
+}

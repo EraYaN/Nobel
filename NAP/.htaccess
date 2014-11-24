@@ -1,4 +1,8 @@
-ErrorDocument 403 /403.php
-order deny,allow
-deny from all
-allow from 5354A349.cm-6-5c.dynamic.ziggo.nl
+AuthName "Beveiligd gedeelte"
+AuthUserFile /home/joostqa22/domains/joostwooning.nl/public_html/.htpasswd
+AuthGroupFile /dev/null
+AuthType Basic
+require valid-user
+
+php_value error_reporting 32767
+php_value include_path ".:/home/joostqa22/domains/joostwooning.nl/public_html/include"

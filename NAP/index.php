@@ -1,27 +1,78 @@
-<?php
-require_once('includes/header.inc.php');
+<?
+require 'nobellib.php';
+require 'header.php';
+
+echo "<h1>Saldo</h1>\n";
+
+$res = nob_exec_query("SELECT `id`, `voornaam`, `tussenvoegsel`, `achternaam`, `ideele_stand`".
+                     " FROM `lid`".
+                     " WHERE `status`<>'Oud-lid'");
+nob_assert($res !== false, 'Could not select leden', true);
+
+echo "<table class='data'>\n";
+
+echo "<tr>\n";
+echo "<td>Naam</td>\n";
+echo "<td>Huidig saldo</td>\n";
+echo "<td>Ideele stand</td>\n";
+echo "<td>Over te maken</td>\n";
+echo "</tr>\n";
+
+$iTotalHuidigSaldo = 0;
+$iTotalIdeeleStand = 0;
+$iTotalOverTeMaken = 0;
+
+while (null !== ($row = $res->fetch_assoc())) {
+	$credDebitNummer = getCreditDebitNummer($row['id']);
+
+	$res2 = nob_exec_query("SELECT SUM(`bedrag`)".
+	                      " FROM `gb_crediteur`".
+	                      " WHERE `crediteurnummer`=".(int)$credDebitNummer['credit']);
+	nob_assert($res2 !== false, 'Kon geen bedrag uit gb_crediteur halen', true);
+	list($sumCredit) = $res2->fetch_row();
+	$iSumCredit = round($sumCredit/DATABASE_CURRENCY_PRECISION);
+
+	$res2 = nob_exec_query("SELECT SUM(`bedrag`)".
+	                      " FROM `gb_debiteur`".
+	                      " WHERE `debiteurnummer`=".(int)$credDebitNummer['debit']);
+	nob_assert($res2 !== false, 'Kon geen bedrag uit gb_debiteur halen', true);
+	list($sumDebit) = $res2->fetch_row();
+	$iSumDebit = round($sumDebit/DATABASE_CURRENCY_PRECISION);
+
+	$res2 = nob_exec_query("SELECT SUM(`transactiebedrag`)".
+	                      " FROM `gb_bankboek`".
+	                      " WHERE `cred/debiteurnummer`=".(int)$credDebitNummer['credit'].
+	                      " OR `cred/debiteurnummer`=".(int)$credDebitNummer['debit']);
+	nob_assert($res2 !== false, 'Kon geen bedrag uit gb_debiteur halen', true);
+	list($sumBankboek) = $res2->fetch_row();
+	$iSumBankboek = round($sumBankboek/DATABASE_CURRENCY_PRECISION);
+
+	$iHuidigSaldo = $iSumCredit - $iSumDebit + $iSumBankboek;
+	$iOverTeMaken = round($row['ideele_stand']/DATABASE_CURRENCY_PRECISION) - $iHuidigSaldo;
+	$htOverTeMaken = ($iOverTeMaken > 0 ? nob_htEuroValue(round($iOverTeMaken*DATABASE_CURRENCY_PRECISION, 4)) : '-');
+
+	$iTotalHuidigSaldo += $iHuidigSaldo;
+	$iTotalIdeeleStand += round($row['ideele_stand']/DATABASE_CURRENCY_PRECISION);
+	$iTotalOverTeMaken += max(0, $iOverTeMaken);
+
+	echo "<tr>\n";
+	echo "<td>".htmlentities($row['voornaam'].' '.$row['tussenvoegsel'].' '.$row['achternaam'])."</td>\n";
+	echo "<td>".nob_htEuroValue(round($iHuidigSaldo*DATABASE_CURRENCY_PRECISION, 4))."</td>\n";
+	echo "<td>".nob_htEuroValue(round($row['ideele_stand'], 4))."</td>\n";
+	echo "<td>{$htOverTeMaken}</td>\n";
+	echo "</tr>\n";
+}
+
+if (isPaltsgraaf()) {
+	echo "<tr class='table_sum'>\n";
+	echo "<td>&nbsp;</td>\n";
+	echo "<td>".nob_htEuroValue(round($iTotalHuidigSaldo*DATABASE_CURRENCY_PRECISION, 4))."</td>\n";
+	echo "<td>".nob_htEuroValue(round($iTotalIdeeleStand*DATABASE_CURRENCY_PRECISION, 4))."</td>\n";
+	echo "<td>".nob_htEuroValue(round($iTotalOverTeMaken*DATABASE_CURRENCY_PRECISION, 4))."</td>\n";
+	echo "</tr>\n";
+}
+
+echo "</table>\n";
+
+require 'footer.php';
 ?>
-<img src="images/logo256.png" alt="Logo" class="logo256">
-<h1 class="title ornatefont">HC Nobel</h1>
-<h2 class="subtitle ornatefont">Opgericht 10 oktober 2010</h2>
-<div style="clear:both;"></div>
-<p>Please come back later. Nothing here.</p>
-<div id="lipsum">
-	<p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ante   metus, hendrerit et quam et, elementum dignissim velit. Nullam vitae   ornare tortor, id dictum sapien. Sed facilisis purus ut volutpat semper.   Aliquam vitae mi nec massa mollis aliquam. Ut sagittis porttitor mi nec   cursus. Fusce egestas rhoncus lorem et consectetur. Cras ut interdum   nulla. Nam eu elit elementum, placerat erat pretium, suscipit lacus.   Cras consectetur tortor nec dapibus porta. Nunc blandit orci in enim   semper, in aliquam nibh bibendum. Mauris cursus est aliquam nisi cursus,   eu porta ipsum vestibulum. Sed lorem risus, bibendum a sapien vel,   fringilla egestas dolor. Nullam fringilla viverra lorem non varius.   Phasellus ultricies accumsan dui vitae molestie. </p>
-	<p> Aliquam urna justo, ornare quis orci vitae, semper facilisis sem. Duis   elementum iaculis magna ut dictum. Donec quis auctor libero, ac congue   turpis. Vivamus lobortis elementum imperdiet. Aenean ornare tempus diam,   at tempus purus luctus at. Etiam lacinia quam a ligula sagittis, in   ornare lectus rhoncus. Suspendisse dapibus velit massa. Quisque metus   velit, aliquam venenatis tristique vitae, rutrum nec elit. </p>
-	<p> Praesent vestibulum velit a adipiscing fermentum. Proin consectetur   lacus ac metus volutpat porttitor. Nulla viverra tortor ac elit   ultricies, et faucibus erat volutpat. Mauris scelerisque felis pharetra   ligula tincidunt, sit amet tempor orci varius. Sed accumsan, metus vitae   volutpat consequat, arcu mauris bibendum sem, in ultrices mi sapien   quis lacus. Curabitur bibendum dui eu dignissim eleifend. Cras lacinia   nulla eget nulla dapibus suscipit. Nam rhoncus vestibulum nibh id   mattis. Donec nec justo ultricies mi volutpat vestibulum eget sit amet   ipsum. Quisque scelerisque ipsum a felis hendrerit, vitae ultricies   felis rhoncus. Sed eu mauris suscipit, gravida sem tristique, tincidunt   erat. </p>
-	<p> In convallis, dolor congue vestibulum aliquet, erat mi sodales purus, in   viverra tellus elit pellentesque mi. Integer quis enim libero.   Suspendisse at massa tincidunt, lacinia sapien id, tempus metus.   Maecenas lorem arcu, iaculis ut porta in, pretium id dolor. Fusce sit   amet rutrum tellus. Suspendisse dictum justo at neque pretium tincidunt.   Quisque semper rhoncus arcu at lacinia. Donec accumsan placerat   lacinia. </p>
-	<p> Quisque venenatis quam vel pharetra ultricies. Vestibulum ante ipsum   primis in faucibus orci luctus et ultrices posuere cubilia Curae; Cras   sit amet massa dictum, mollis ligula hendrerit, lacinia elit. Maecenas   risus metus, vulputate tempor enim nec, cursus consectetur quam. Sed ac   risus semper, aliquet sapien a, venenatis magna. Nam ut urna odio. Duis   vel faucibus nisi, eu semper odio. Proin tempus aliquet adipiscing. Duis   at massa at quam auctor placerat. Maecenas lacinia enim vitae arcu   lacinia, non euismod odio placerat. Integer sit amet volutpat erat, eget   tempus orci. Pellentesque at tempor massa. Donec varius pharetra risus. </p>
-	<p> Curabitur sit amet ligula nunc. Sed at volutpat massa, at pretium   tellus. Praesent blandit sapien et est fringilla, vel vulputate elit   feugiat. In quis risus gravida nunc egestas placerat. Nullam convallis   tellus sit amet velit gravida semper. Nullam mattis, metus id aliquam   blandit, dui orci convallis augue, eget lacinia est massa vel est.   Maecenas lacinia eu est sit amet interdum. Aliquam erat volutpat. Duis   feugiat lobortis scelerisque. Morbi augue eros, vestibulum in mauris et,   condimentum porta felis. Vestibulum diam sem, scelerisque nec   pellentesque id, suscipit ut libero. Nullam hendrerit rhoncus mi, nec   mattis elit hendrerit sit amet. Nulla sit amet magna vehicula, mollis   metus sit amet, vestibulum enim. </p>
-	<p> Fusce mollis massa a urna hendrerit porttitor. Vivamus mattis convallis   vulputate. Maecenas blandit, neque vitae vehicula aliquet, metus sapien   pellentesque lacus, sit amet fermentum purus velit sit amet lectus.   Aenean ultrices enim scelerisque tellus gravida, posuere feugiat ipsum   rhoncus. Etiam dignissim, massa sit amet imperdiet commodo, lectus nisi   suscipit enim, vel sodales odio ante at sem. Nam sit amet lectus nunc.   Suspendisse quis arcu congue, semper sapien in, viverra sapien. Cras   quis pellentesque est, nec varius leo. Donec semper, lorem at tristique   interdum, urna risus aliquet lorem, sed aliquet turpis dui id elit.   Donec imperdiet massa at velit mattis, vitae volutpat purus euismod. Nam   mattis sed tortor ut pretium. </p>
-	<p> Quisque diam nulla, accumsan sit amet eleifend eu, placerat id nibh.   Morbi molestie sodales arcu id laoreet. Phasellus semper dui a nisi   laoreet faucibus. Donec sagittis fermentum nunc, ut mattis libero   commodo sed. Vivamus tempor ac arcu vitae luctus. Mauris vel sem   consequat, vehicula lorem sed, vestibulum nisi. Donec nec enim lectus.   Etiam quis nunc semper, viverra neque ac, ultricies eros. Nunc tempor   pellentesque ante vitae rhoncus. Morbi vel nisl vitae magna mattis   scelerisque sed a ante. Nunc ullamcorper magna et bibendum adipiscing.   Integer blandit turpis eu bibendum rutrum. Praesent sed eros blandit   lectus faucibus molestie. Donec sollicitudin malesuada ante. Cras eget   eros at mi egestas gravida. Nunc a sapien enim. </p>
-	<p> Phasellus tempor blandit tristique. Nam consectetur mauris felis, ut   malesuada urna euismod mollis. Sed et est nisl. Quisque lobortis ac   augue non venenatis. Maecenas vitae scelerisque elit. Mauris feugiat   lacus sapien. Sed bibendum lectus ac tellus fringilla, laoreet pharetra   ipsum pharetra. Suspendisse eu odio pulvinar, vehicula massa eu, rhoncus   felis. Fusce id aliquet risus. Etiam non elit commodo, aliquam sapien   a, molestie felis. Sed nisi dui, lobortis at leo sit amet, convallis   rutrum dui. Integer pretium, ligula eu bibendum tincidunt, elit neque   scelerisque ante, eget mollis elit ante quis metus. Sed sit amet   imperdiet lacus, non porttitor odio. Nunc sollicitudin est nec lobortis   tincidunt. Maecenas et neque et nibh rutrum vehicula. Duis ultrices   viverra nisl. </p>
-	<p> Proin lobortis dui nec dolor consectetur lobortis. Proin sed rutrum   turpis, id commodo lectus. Curabitur bibendum porta ipsum quis vehicula.   Nam ultrices, ligula at vehicula adipiscing, elit mi laoreet leo, et   luctus sapien sapien sed neque. In iaculis iaculis massa eu tristique.   Suspendisse porta ultricies rutrum. Vivamus facilisis nibh et lacus   consectetur, eu interdum lorem posuere. Quisque cursus nibh vitae   adipiscing molestie. Donec interdum bibendum neque, et venenatis quam   sodales eu. Fusce posuere iaculis odio et dictum. Nam pretium dictum   tempus. Ut urna dolor, condimentum ut fermentum id, tincidunt quis mi.   Aliquam volutpat lectus sed lacus dapibus luctus. Suspendisse cursus   mauris quis mollis mattis. Praesent malesuada fermentum elit nec   sagittis. Aliquam adipiscing iaculis odio, sed malesuada sem fermentum   ac. </p>
-	<p> Nullam viverra diam eu condimentum pulvinar. Nullam ullamcorper nulla   sem, in tempus tortor vestibulum et. Donec tristique luctus aliquam.   Quisque hendrerit enim ut cursus tristique. Aliquam quis euismod odio,   vel suscipit urna. Fusce commodo ullamcorper vehicula. Nullam convallis,   purus ac iaculis vehicula, est risus interdum nibh, eu pellentesque   nisl leo in sapien. Quisque consectetur fermentum magna. Duis vestibulum   hendrerit semper. Sed a tempor quam. </p>
-	<p> Aenean ultrices lorem in metus laoreet, vel congue odio tincidunt. Cras   varius ac massa a auctor. Nam cursus ante ipsum, id blandit ligula   eleifend a. Praesent convallis molestie nisi, ullamcorper commodo ante   venenatis quis. Praesent imperdiet quam eros, et posuere sapien   elementum non. Nunc vitae ligula ut quam lobortis adipiscing. Nulla ac   mollis sem. Quisque auctor purus vitae ligula posuere, rutrum elementum   diam fermentum. Phasellus vulputate ullamcorper sapien quis interdum. </p>
-	<p> Fusce libero est, venenatis vel rutrum vitae, scelerisque sit amet   lacus. Aliquam pretium felis aliquet turpis tincidunt, eget fermentum   eros rutrum. Duis vitae metus vestibulum, luctus tellus et, porta erat.   Donec lectus tortor, interdum id sodales at, auctor id risus. Ut vitae   felis neque. Nunc magna urna, tempor tincidunt purus eu, faucibus   malesuada leo. Nulla facilisi. Phasellus mattis turpis nec venenatis   tempus. Nulla eros turpis, accumsan ac aliquet eget, egestas ut enim. </p>
-	<p> Vivamus at scelerisque sapien. Suspendisse non nisl eu leo molestie   cursus. Fusce in enim dictum, condimentum nisi id, feugiat eros. Donec   congue sem vitae dui mollis blandit sed a dolor. Nullam et augue   gravida, sollicitudin quam ac, porta magna. Etiam ac semper dui, sit   amet consectetur enim. Proin vulputate, sem at sollicitudin feugiat,   turpis nisl tincidunt erat, at feugiat leo velit in nulla. Aenean augue   magna, blandit at ornare in, auctor eget purus. In hac habitasse platea   dictumst. Nam lorem orci, pulvinar vel nibh ac, congue vulputate est. In   scelerisque lacus sit amet luctus convallis. Aenean vulputate nec lorem   nec facilisis. Etiam placerat lectus eget massa accumsan porta. Nullam   laoreet cursus rutrum. Vivamus quam mi, sollicitudin quis ipsum nec,   convallis luctus neque. </p>
-	<p> Suspendisse dapibus pharetra enim, ut tristique eros bibendum eget.   Curabitur eget erat a lacus ultrices adipiscing id vel sem. Nam quam   ipsum, feugiat eu tempor quis, porttitor eu magna. Duis et ante gravida,   vehicula mauris eget, tincidunt dolor. Sed in mauris est. Cras a dolor   eget purus tincidunt interdum vel sed elit. Sed eget ornare est. Aenean   turpis felis, accumsan vitae molestie scelerisque, imperdiet sit amet   nulla. Donec mauris enim, sodales mattis ipsum eget, ullamcorper congue   lorem. Vestibulum porta sapien justo, ac sollicitudin purus faucibus   nec. Aenean elementum imperdiet posuere. Mauris nec vestibulum nisi. Sed   congue nunc odio, eget consequat nunc condimentum ut. Donec vitae felis   at ligula blandit congue. Mauris eu arcu eros. Etiam risus justo,   congue et est nec, blandit interdum sapien. </p>
-</div>
-</body>
-</html>

@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,8 +32,8 @@ namespace Nobel
 		Action updateDB;
 		//DateTime ecoStart = new DateTime(2013, 9, 18, 19, 00, 00);
        // DateTime ecoEnd = new DateTime(2013, 9, 19, 8, 00, 00);
-        DateTime ecoStart = new DateTime(2015, 3, 16, 17, 00, 00);
-        DateTime ecoEnd = new DateTime(2015, 3, 17, 0, 00, 00);
+        DateTime ecoStart;// = new DateTime(0, 0, 0, 17, 00, 00);
+        DateTime ecoEnd;// = new DateTime(0, 0, 0, 0, 00, 00);
 		TimeSpan timeslotLen = new TimeSpan(0, 30, 0);
 		object _updaterLock = new object();
 		int totalQueries = 0;
@@ -310,6 +310,27 @@ WHERE Prijs_Naam LIKE ?product AND Bestelling_Time>=?timestart AND Bestelling_Ti
                 MessageBox.Show("Enter password.");
                 return;
             }
+
+			if (datePicker.SelectedDate == null)
+			{
+				MessageBox.Show("Select date.");
+				return;
+			}
+			int duration = 0;
+			if (!Int32.TryParse(durationTextBox.Text, out duration))
+			{
+				MessageBox.Show("Enter duration in full hours.");
+				return;
+			}
+
+			DateTime date = (DateTime)datePicker.SelectedDate;
+			ecoStart = new DateTime(date.Year, date.Month, date.Day, 17, 0, 0);
+			ecoEnd = ecoStart + new TimeSpan(duration,0,0);
+
+			writeOutputText(String.Format("Statistics start on {0} and end on {1}.", ecoStart, ecoEnd));
+
+			writeOutputText(String.Format("Connecting...", ecoStart, ecoEnd));
+
             csb.Server = serverTextBox.Text;
             csb.Database = databaseTextBox.Text;
             csb.UserID = userTextBox.Text;
@@ -325,6 +346,7 @@ WHERE Prijs_Naam LIKE ?product AND Bestelling_Time>=?timestart AND Bestelling_Ti
                 }
                 else
                 {
+					writeOutputText(String.Format("Connected.", ecoStart, ecoEnd));
                     mysqlConnectButton.IsEnabled = false;
                     timerDatabase.Start();
                     getCmd = new MySqlCommand(getQuery, connection);

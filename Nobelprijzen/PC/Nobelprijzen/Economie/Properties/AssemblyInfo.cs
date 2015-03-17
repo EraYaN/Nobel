@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -52,6 +52,6 @@ using System.Windows;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("0.5.29.7")]
-[assembly: AssemblyFileVersion("2015.3.16.50")]
+[assembly: AssemblyVersion("0.5.51.0")]
+[assembly: AssemblyFileVersion("2015.3.17.51")]
 

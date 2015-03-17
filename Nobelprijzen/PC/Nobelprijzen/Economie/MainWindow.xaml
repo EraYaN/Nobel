@@ -8,7 +8,7 @@
 		<Label Content="Server" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center" Target="{Binding ElementName=serverTextBox, Mode=OneWay}"/>
 		<TextBox x:Name="userTextBox" HorizontalAlignment="Left" Height="23" Margin="74,38,0,0" TextWrapping="Wrap" Text="barkasread" Width="120" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
 		<Label Content="User" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center" Target="{Binding ElementName=userTextBox, Mode=OneWay}"/>
-		<PasswordBox x:Name="passwordBox" HorizontalAlignment="Left" Margin="74,66,0,0" VerticalAlignment="Top" Width="120" Height="23" VerticalContentAlignment="Center" Password="lezen"/>
+		<PasswordBox x:Name="passwordBox" HorizontalAlignment="Left" Margin="74,66,0,0" VerticalAlignment="Top" Width="120" Height="23" VerticalContentAlignment="Center" Password="nobelPrijzen2000vijftien"/>
 		<Label Content="Password" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center" Target="{Binding ElementName=passwordBox, Mode=OneWay}"/>
 		<TextBox x:Name="databaseTextBox" HorizontalAlignment="Left" Height="23" Margin="74,94,0,0" TextWrapping="Wrap" Text="barkas_1_0_prod" Width="120" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
 		<Label Content="Database" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center" Target="{Binding ElementName=databaseTextBox, Mode=OneWay}"/>
@@ -21,7 +21,7 @@
 		<ListBox x:Name="pointSourcesListBox" Height="73" Margin="199,150,10,0" VerticalAlignment="Top"/>
 		<Label Content="Date" HorizontalAlignment="Left" Margin="10,122,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center" Target="{Binding ElementName=datePicker, Mode=OneWay}"/>
 		<DatePicker x:Name="datePicker" HorizontalAlignment="Left" Margin="74,122,0,0" VerticalAlignment="Top" Height="23" Width="120" SelectedDate="{x:Static sys:DateTime.Now}"/>
-		<Label Content="Hours" HorizontalAlignment="Left" Margin="10,150,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center" Target="{Binding ElementName=durationTextBox, Mode=OneWay}"/>
+		<Label Content="Length (h)" HorizontalAlignment="Left" Margin="10,150,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.154" Height="23" Padding="0" VerticalContentAlignment="Center" Target="{Binding ElementName=durationTextBox, Mode=OneWay}"/>
 		<TextBox x:Name="durationTextBox" HorizontalAlignment="Left" Height="23" Margin="74,150,0,0" TextWrapping="Wrap" Text="7" Width="120" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
 
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -39,7 +39,7 @@ namespace Nobel
 		public void showTimes(String teamA, long msA, String teamB, long msB)
 		{
 			//MessageBox.Show(teamA+": "+msA+"\n"+teamB+": "+msB);
-            stopwatchLabel.Content = String.Format("{0} wins!", (msA > msB ? teamA : teamB));
+            stopwatchLabel.Content = String.Format("{0} wins!", (msA < msB ? teamA : teamB));
 			teamATime.Content = String.Format("{1}: {0:F2}", (double)msA / 1000, teamA);
 			teamATime.Foreground = Brushes.White;
 			teamBTime.Content = String.Format("{1}: {0:F2}", (double)msB / 1000, teamB);
